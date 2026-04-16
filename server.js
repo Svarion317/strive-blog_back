@@ -12,7 +12,11 @@ connect();
 
 const app = express();
 
-const defaultOrigins = ["http://localhost:5173", "http://127.0.0.1:5173"];
+const defaultOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://strive-blog-front.vercel.app",
+];
 const corsOrigins = (process.env.CORS_ORIGINS || defaultOrigins.join(","))
   .split(",")
   .map((origin) => origin.trim())

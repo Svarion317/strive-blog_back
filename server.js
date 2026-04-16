@@ -43,6 +43,9 @@ app.use("/blogposts", blogPostRouter);
 app.use("/blogposts/:blogPostId/comments", commentRouter);
 app.use("/auth", authRouter);
 
-app.listen(process.env.PORT, () => {
-  console.log("server in ascolto");
+const parsedPort = Number.parseInt(process.env.PORT, 10);
+const port = Number.isInteger(parsedPort) && parsedPort >= 0 && parsedPort <= 65535 ? parsedPort : 3000;
+
+app.listen(port, () => {
+  console.log(`server in ascolto sulla porta ${port}`);
 });

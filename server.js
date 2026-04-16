@@ -17,18 +17,29 @@ const defaultOrigins = [
   "http://127.0.0.1:5173",
   "https://strive-blog-front.vercel.app",
 ];
-const corsOrigins = (process.env.CORS_ORIGINS || defaultOrigins.join(","))
+const envOrigins = (process.env.CORS_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+const corsOrigins = [...new Set([...defaultOrigins, ...envOrigins])];
+
+const isAllowedVercelPreviewOrigin = (origin) => {
+  try {
+    const { protocol, hostname } = new URL(origin);
+    return protocol === "https:" && /^strive-blog-front.*\.vercel\.app$/i.test(hostname);
+  } catch {
+    return false;
+  }
+};
 
 const corsOptions = {
   origin(origin, callback) {
-    if (!origin || corsOrigins.includes(origin)) {
+    if (!origin || corsOrigins.includes(origin) || isAllowedVercelPreviewOrigin(origin)) {
       callback(null, true);
       return;
     }
 
+    console.warn(`[CORS] Origin bloccata: ${origin}`);
     callback(new Error("Origin non consentita da CORS"));
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

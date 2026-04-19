@@ -43,3 +43,13 @@ export async function login(req, res) {
     });
   }
 }
+
+export async function me(req, res) {
+  try {
+    return res.status(200).json(req.authUser);
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+}

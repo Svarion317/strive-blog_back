@@ -4,9 +4,12 @@ import Author from "../models/Author.js";
 export async function findAll(req, res) {
   try {
     const { page, limit } = req.query;
-    const authorsQuery = Author.find().select("-password");
-    if (page && limit) {
-      authorsQuery.skip((page - 1) * limit).limit(limit);
+    const parsedPage = Number.parseInt(page, 10);
+    const parsedLimit = Number.parseInt(limit, 10);
+
+    const authorsQuery = Author.find().select("-password").lean();
+    if (Number.isInteger(parsedPage) && parsedPage > 0 && Number.isInteger(parsedLimit) && parsedLimit > 0) {
+      authorsQuery.skip((parsedPage - 1) * parsedLimit).limit(parsedLimit);
       //authorsQuery.skip((page - 1) * 1).limit(1);
     }
     const authors = await authorsQuery;

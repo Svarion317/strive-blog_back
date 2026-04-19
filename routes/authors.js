@@ -13,7 +13,7 @@ import { authentication } from "../middleware/autentication.js";
 const authorRouter = express.Router();
 authorRouter.get("/", findAll);
 authorRouter.get("/:id", findById);
-authorRouter.post("/", authentication, create);
+authorRouter.post("/", create);
 authorRouter.delete("/:id", authentication, cancel);
 authorRouter.put("/:id", authentication, update);
 authorRouter.patch(

@@ -4,9 +4,12 @@ import BlogPost from "../models/BlogPost.js";
 export async function findAll(req, res) {
   try {
     const { page, limit } = req.query;
-    const blogPostsQuery = BlogPost.find();
-    if (page && limit) {
-      blogPostsQuery.skip((page - 1) * limit).limit(limit);
+    const parsedPage = Number.parseInt(page, 10);
+    const parsedLimit = Number.parseInt(limit, 10);
+
+    const blogPostsQuery = BlogPost.find().lean();
+    if (Number.isInteger(parsedPage) && parsedPage > 0 && Number.isInteger(parsedLimit) && parsedLimit > 0) {
+      blogPostsQuery.skip((parsedPage - 1) * parsedLimit).limit(parsedLimit);
     }
     const blogPosts = await blogPostsQuery;
     res.status(200).json(blogPosts);
@@ -126,12 +129,18 @@ export async function uploadBlogPostCover(req, res) {
     if (!req.file) {
       return res.status(400).json({ message: "error uploading file" });
     }
+
+    const coverUrl = req.file.path || req.file.secure_url || req.file.url;
+    if (!coverUrl) {
+      return res.status(500).json({ message: "cover url not found after upload" });
+    }
+
     const post = await BlogPost.findByIdAndUpdate(
       id,
       {
-        cover: req.file.path,
+        cover: coverUrl,
       },
-      { returnDocument: "after" },
+      { new: true, runValidators: true },
     );
     if (!post) {
       return res.status(404).json({ message: "post not found" });

@@ -8,7 +8,6 @@ import commentRouter from "./routes/comments.js";
 import authRouter from "./routes/auth.js";
 
 dotenv.config();
-connect();
 
 const app = express();
 
@@ -61,6 +60,14 @@ app.use("/auth", authRouter);
 const parsedPort = Number.parseInt(process.env.PORT, 10);
 const port = Number.isInteger(parsedPort) && parsedPort >= 0 && parsedPort <= 65535 ? parsedPort : 3000;
 
-app.listen(port, () => {
-  console.log(`server in ascolto sulla porta ${port}`);
+async function bootstrap() {
+  await connect();
+  app.listen(port, () => {
+    console.log(`server in ascolto sulla porta ${port}`);
+  });
+}
+
+bootstrap().catch((error) => {
+  console.error("avvio server fallito", error);
+  process.exit(1);
 });

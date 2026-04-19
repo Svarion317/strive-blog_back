@@ -22,13 +22,21 @@ export async function authentication(req, res, next) {
         return res.status(401).json({ message: "token non valido" });
       }
 
-      const author = await Author.findById(payload.id).select("-password");
-      if (!author) {
-        return res.status(401).json({ message: "utente non autorizzato" });
-      }
+      try {
+        if (!payload?.id) {
+          return res.status(401).json({ message: "token non valido" });
+        }
 
-      req.authUser = author;
-      return next();
+        const author = await Author.findById(payload.id).select("-password");
+        if (!author) {
+          return res.status(401).json({ message: "utente non autorizzato" });
+        }
+
+        req.authUser = author;
+        return next();
+      } catch (dbError) {
+        return res.status(500).json({ message: dbError.message });
+      }
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
